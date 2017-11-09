@@ -1,0 +1,71 @@
+---
+- hosts: localhost
+  remote_user: root
+
+  vars:
+    sudoers_d:
+      - name: 'test1'
+        users:
+          - testuser1
+        computers:
+          - ALL
+        runas:
+          - ALL
+        nopasswd: false
+      - name: 'test2'
+        users: testuser2
+        computers: ALL
+        runas: ALL
+      - name: 'test3'
+        users:
+          - test1
+          - test2
+        computers: ALL
+        runas: ALL
+        nopasswd: true
+    sudo_sudoers_enabled:
+      - test2
+      - test3
+
+  roles:
+    - role_under_test
+
+  tasks:
+    - name: [Test] Does test1 configuration file exist?
+      stat:
+        path: /etc/sudoers.d/test1
+      register: test1_file
+      ignore_errors: true
+
+    - name: [Test] Does test2 configuration file exist?
+      stat:
+        path: /etc/sudoers.d/test2
+      register: test2_file
+      ignore_errors: true
+
+    - name: [Test] Does test3 configuration file exist?
+      stat:
+        path: /etc/sudoers.d/test3
+      register: test3_file
+      ignore_errors: true
+
+    - name: [Test] Test file2 contents
+      shell: cat /etc/sudoers.d/test2
+      when: test2_file.stat.exists
+      register: test2_file_contents
+
+    - name: [Test] Test file3 contents
+      shell: cat /etc/sudoers.d/test3
+      when: test3_file.stat.exists
+      register: test3_file_contents
+
+    - assert:
+        that:
+          - not test1_file.stat.exists
+          - test2_file.stat.exists
+          - test3_file.stat.exists
+          - not test2_file_contents.stdout.find('NOPASSWD')
+          - test2_file_contents.stdout.find('test2')
+          - test3_file_contents.stdout.find('NOPASSWD')
+          - test3_file_contents.stdout.find('test1')
+          - test3_file_contents.stdout.find('test2')

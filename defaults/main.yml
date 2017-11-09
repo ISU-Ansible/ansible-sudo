@@ -1,0 +1,11 @@
+---
+# By default, no sudo users are enabled
+sudoers_d: []
+sudo_sudoers_enabled: []
+
+#sudoers_d:
+#  - name: ''
+#    users: []
+#    computers: []
+#    runas: []
+#    nopasswd: true
