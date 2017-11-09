@@ -65,7 +65,7 @@
           - not test1_file.stat.exists
           - test2_file.stat.exists
           - test3_file.stat.exists
-          - not test2_file_contents.stdout.find('NOPASSWD')
+          - test2_file_contents.stdout.find('NOPASSWD') != 0
           - test2_file_contents.stdout.find('test2')
           - test3_file_contents.stdout.find('NOPASSWD')
           - test3_file_contents.stdout.find('test1')
