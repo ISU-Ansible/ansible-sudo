@@ -1,8 +1,5 @@
 ---
-- name: (Sudo) Create sudoers.d directory
-  tags:
-    - sudo
-    - configuration
+- name: SUDO | Create sudoers.d directory
   file:
     path: /etc/sudoers.d
     owner: root
@@ -10,20 +7,14 @@
     mode: 0755
     state: directory
 
-- name: (Sudo) Set includedir in sudoers
-  tags:
-    - sudo
-    - configuration
+- name: SUDO | Set includedir in sudoers
   lineinfile:
     dest: /etc/sudoers
     line: "#includedir /etc/sudoers.d"
     state: present
     validate: "/usr/sbin/visudo -cf %s"
 
-- name: (Sudo) Enable sudoers in 'sudo_sudoers_enabled'
-  tags:
-    - sudo
-    - configuration
+- name: SUDO | Enable sudoers in 'sudo_sudoers_enabled'
   template:
     src: sudoers.j2
     dest: "/etc/sudoers.d/{{ item.name }}"
@@ -31,17 +22,14 @@
     owner: root
     group: root
     validate: "/usr/sbin/visudo -cf %s"
-  when: item.name in sudo_sudoers_enable
+  when: item.name in sudo_sudoers_enabled
   with_items:
     - "{{ sudoers_d }}"
 
-- name: (Sudo) Remove sudoers if not in 'sudo_sudoers_enabled'
-  tags:
-    - sudo
-    - configuration
+- name: SUDO | Remove sudoers if not in 'sudo_sudoers_enabled'
   file:
     path: "/etc/sudoers.d/{{ item.name }}"
     state: absent
-  when: not item.name in sudo_sudoers_enable
+  when: not item.name in sudo_sudoers_enabled
   with_items:
     - "{{ sudoers_d }}"
