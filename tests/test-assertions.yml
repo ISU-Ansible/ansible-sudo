@@ -16,6 +16,7 @@
         users: testuser2
         computers: ALL
         runas: ALL
+        nopasswd: false
       - name: 'test3'
         users:
           - test1
